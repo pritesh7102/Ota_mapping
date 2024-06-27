@@ -21,20 +21,24 @@ export default function Flow() {
   const [yConfirmed, setYConfirmed] = React.useState(50);
   const [yPosition, setYPosition] = React.useState(yConfirmed + 100);
   const [yPositionOta, setYPositionOta] = React.useState(yConfirmed + 100);
+  // const [check, setCheck] = React.useState(false);
 
   useEffect(() => {
-    edges.map((edge) => {
+    edges.forEach((edge) => {
       const sourceConfirmed = nodes.find((node) => node.id === edge.source);
       const targetConfirmed = nodes.find((node) => node.id === edge.target);
-      console.log(sourceConfirmed, targetConfirmed, "confirmed");
-
-      // edges.filter((ed) => {ed.source !== sourceConfirmed.id && ed.target !== targetConfirmed.id})
-      // nodes.filter((nd) => {nd.id !== sourceConfirmed.id || nd.id !== targetConfirmed.id})
-      handleAddConfirm(sourceConfirmed.data.label, 450, sourceConfirmed.id, targetConfirmed.data.label, 950, targetConfirmed.id);
-    //   handleAdd(sourceConfirmed.label, yConfirmed, sourceConfirmed.id);
+      // console.log(sourceConfirmed, targetConfirmed, "confirmed");
+      console.log(sourceConfirmed.position, targetConfirmed.position, "found");
+      handleAddConfirm(
+        sourceConfirmed.data.label,
+        450,
+        sourceConfirmed.id,
+        targetConfirmed.data.label,
+        950,
+        targetConfirmed.id
+      );
     });
-    console.log("called useEffect");
-  }, [edges])
+  }, [edges.length]);
 
   const onConnect = useCallback((params) => {
     console.log(params);
@@ -83,14 +87,16 @@ export default function Flow() {
       targetPosition: "left",
     };
     const newNodeT = {
-        id: idT.toString(),
-        position: { x: positionT, y: yConfirmed },
-        data: { label: typeT },
-        sourcePosition: "right",
-        targetPosition: "left",
-      };
+      id: idT.toString(),
+      position: { x: positionT, y: yConfirmed },
+      data: { label: typeT },
+      sourcePosition: "right",
+      targetPosition: "left",
+    };
+    console.log(newNodeS.position, newNodeT.position, "position changed");
     setYConfirmed(yConfirmed + 100);
-    const newNodes = [...nodes, newNodeS, newNodeT];
+    const temp = nodes.filter((n) => !(n.id === idS || n.id === idT))
+    const newNodes = [...temp, newNodeS, newNodeT];
     setNodes(newNodes);
   };
 
@@ -107,19 +113,6 @@ export default function Flow() {
     // // }
     onNodesChange(e);
   };
-
-  // const handleConfirm = () => {
-  //   edges.map((edge) => {
-  //     const sourceConfirmed = nodes.find((node) => node.id === edge.source);
-  //     const targetConfirmed = nodes.find((node) => node.id === edge.target);
-  //     console.log(sourceConfirmed, targetConfirmed, "confirmed");
-
-  //     // edges.filter((ed) => {ed.source !== sourceConfirmed.id && ed.target !== targetConfirmed.id})
-  //     // nodes.filter((nd) => {nd.id !== sourceConfirmed.id || nd.id !== targetConfirmed.id})
-  //     handleAddConfirm(sourceConfirmed.data.label, 450, sourceConfirmed.id, targetConfirmed.data.label, 950, targetConfirmed.id);
-  //   //   handleAdd(sourceConfirmed.label, yConfirmed, sourceConfirmed.id);
-  //   });
-  // };
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
