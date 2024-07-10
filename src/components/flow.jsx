@@ -19,7 +19,7 @@ export default function Flow() {
   const [yPosition, setYPosition] = React.useState(yConfirmed + 100);
   const [yPositionOta, setYPositionOta] = React.useState(yConfirmed + 100);
   const [confirmedEdges, setConfirmedEdges] = React.useState([]);
-  const [check, setCheck] = React.useState(false);
+  const [checkEffect, setCheckEffect] = React.useState(false);
 
   // const [check, setCheck] = React.useState(false);
   useEffect(() => {
@@ -81,10 +81,10 @@ export default function Flow() {
       });
       setConfirmedEdges(filteredCustomEdges);
     });
-  }, [check]);
+  }, [checkEffect]);
 
   const handleClick = () => {
-    setCheck(!check);
+    setCheckEffect(!checkEffect);
   };
 
   const onConnect = useCallback((params) => {
@@ -99,29 +99,49 @@ export default function Flow() {
   });
 
   const handleAdd = (type, positionX, positionY, id) => {
-    const newNode = {
-      id: id,
-      position: { x: positionX + 250, y: positionY - 40 },
-      data: { label: type },
-      sourcePosition: "right",
-      targetPosition: "left",
-    };
-    // setYPosition(yPosition + 100);
-    const newNodes = [...nodes, newNode];
-    setNodes(newNodes);
+    let check = false;
+    nodes.forEach((node) => {
+      if (node.id === id) {
+        check = true;
+      }
+    });
+    if (check !== true) {
+      const newNode = {
+        id: id,
+        position: { x: positionX + 250, y: positionY - 40 },
+        data: { label: type },
+        sourcePosition: "right",
+        targetPosition: "left",
+      };
+      // setYPosition(yPosition + 100);
+      const newNodes = [...nodes, newNode];
+      setNodes(newNodes);
+    } else {
+      console.log("Already added");
+    }
   };
 
   const handleAddOta = (type, positionX, positionY, id) => {
-    const newNode = {
-      id: id.toString(),
-      position: { x: positionX - 400, y: positionY - 40 },
-      data: { label: type },
-      sourcePosition: "right",
-      targetPosition: "left",
-    };
-    // setYPositionOta(yPositionOta + 100);
-    const newNodes = [...nodes, newNode];
-    setNodes(newNodes);
+    let check = false;
+    nodes.forEach((node) => {
+      if (node.id === id) {
+        check = true;
+      }
+    });
+    if (check !== true) {
+      const newNode = {
+        id: id.toString(),
+        position: { x: positionX - 400, y: positionY - 40 },
+        data: { label: type },
+        sourcePosition: "right",
+        targetPosition: "left",
+      };
+      // setYPositionOta(yPositionOta + 100);
+      const newNodes = [...nodes, newNode];
+      setNodes(newNodes);
+    } else {
+      console.log("Already added");
+    }
   };
 
   const handleAddConfirm = (typeS, positionS, idS, typeT, positionT, idT) => {
