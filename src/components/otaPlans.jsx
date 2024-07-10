@@ -11,13 +11,18 @@ export default function OtaPlans(props) {
           <div
             key={`${roomType.room_type_code}-${ratePlan.rate_plan_code}`}
             className="button-cms-mapping"
-            onClick={() =>
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const centerX = rect.left + rect.width / 2;
+              const centerY = rect.top + rect.height / 2;
+              console.log(`Center X: ${centerX}, Center Y: ${centerY}`);
               handleAdd(
                 `${roomType.room_type_code}, ${roomType.room_type_name}, ${ratePlan.rate_plan_code}, ${ratePlan.rate_plan_name}`,
-                950,
+                centerX,
+                centerY,
                 `${roomType.room_type_code}-${ratePlan.rate_plan_code}`
-              )
-            }
+              );
+            }}
           >
             <div>
               {roomType.room_type_code} {roomType.room_type_name}

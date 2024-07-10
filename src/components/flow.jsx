@@ -18,27 +18,77 @@ const initialEdges = [];
 export default function Flow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [yConfirmed, setYConfirmed] = React.useState(50);
+  const [yConfirmed, setYConfirmed] = React.useState(0);
   const [yPosition, setYPosition] = React.useState(yConfirmed + 100);
   const [yPositionOta, setYPositionOta] = React.useState(yConfirmed + 100);
-  // const [check, setCheck] = React.useState(false);
+  const [confirmedEdges, setConfirmedEdges] = React.useState([]);
+  const [check, setCheck] = React.useState(false);
 
+  // const [check, setCheck] = React.useState(false);
   useEffect(() => {
     edges.forEach((edge) => {
       const sourceConfirmed = nodes.find((node) => node.id === edge.source);
       const targetConfirmed = nodes.find((node) => node.id === edge.target);
-      // console.log(sourceConfirmed, targetConfirmed, "confirmed");
-      console.log(sourceConfirmed.position, targetConfirmed.position, "found");
-      handleAddConfirm(
-        sourceConfirmed.data.label,
-        450,
-        sourceConfirmed.id,
-        targetConfirmed.data.label,
-        950,
-        targetConfirmed.id
+
+      // Check if the edge is already in confirmedEdges
+      const edgeAlreadyConfirmed = confirmedEdges.some(
+        (confirmedEdge) =>
+          confirmedEdge.sourceid === sourceConfirmed.id &&
+          confirmedEdge.targetid === targetConfirmed.id
       );
+
+      if (!edgeAlreadyConfirmed) {
+        // If the edge is not already confirmed, add it to confirmedEdges
+        setConfirmedEdges((prev) => [
+          ...prev,
+          {
+            sourcelabel: sourceConfirmed.data.label,
+            sourceid: sourceConfirmed.id,
+            positionS: 450,
+            positionT: 950,
+            targetid: targetConfirmed.id,
+            targetlabel: targetConfirmed.data.label,
+          },
+        ]);
+      }
     });
-  }, [edges.length]);
+  }, [edges.length]); // Include all dependencies used inside useEffect
+
+  // useEffect(() => {
+  //   confirmedEdges.forEach((edge) => {
+  //     handleAddConfirm(
+  //       edge.sourcelabel,
+  //       450,
+  //       edge.sourceid,
+  //       edge.targetlabel,
+  //       950,
+  //       edge.targetid
+  //     );
+  //   });
+  // }, [edges.length]);
+  useEffect(() => {
+    confirmedEdges.forEach((edge) => {
+      handleAddConfirm(
+        edge.sourcelabel,
+        450,
+        edge.sourceid,
+        edge.targetlabel,
+        950,
+        edge.targetid
+      );
+      const filteredCustomEdges = confirmedEdges.filter((customEdge) => {
+        return !(
+          customEdge.sourceid === edge.sourceid &&
+          customEdge.targetid === edge.targetid
+        );
+      });
+      setConfirmedEdges(filteredCustomEdges);
+    });
+  }, [check]);
+
+  const handleClick = () => {
+    setCheck(!check);
+  };
 
   const onConnect = useCallback((params) => {
     console.log(params);
@@ -51,28 +101,28 @@ export default function Flow() {
     );
   });
 
-  const handleAdd = (type, position, id) => {
+  const handleAdd = (type, positionX, positionY, id) => {
     const newNode = {
       id: id,
-      position: { x: position, y: yPosition },
+      position: { x: positionX + 250, y: positionY - 40 },
       data: { label: type },
       sourcePosition: "right",
       targetPosition: "left",
     };
-    setYPosition(yPosition + 100);
+    // setYPosition(yPosition + 100);
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);
   };
 
-  const handleAddOta = (type, position, id) => {
+  const handleAddOta = (type, positionX, positionY, id) => {
     const newNode = {
       id: id.toString(),
-      position: { x: position, y: yPositionOta },
+      position: { x: positionX - 400, y: positionY - 40 },
       data: { label: type },
       sourcePosition: "right",
       targetPosition: "left",
     };
-    setYPositionOta(yPositionOta + 100);
+    // setYPositionOta(yPositionOta + 100);
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);
   };
@@ -95,7 +145,7 @@ export default function Flow() {
     };
     console.log(newNodeS.position, newNodeT.position, "position changed");
     setYConfirmed(yConfirmed + 100);
-    const temp = nodes.filter((n) => !(n.id === idS || n.id === idT))
+    const temp = nodes.filter((n) => !(n.id === idS || n.id === idT));
     const newNodes = [...temp, newNodeS, newNodeT];
     setNodes(newNodes);
   };
@@ -129,11 +179,16 @@ export default function Flow() {
         <Panel position="right">
           <OtaPlans handleAdd={handleAddOta} />
         </Panel>
-        {/* <Panel position="bottom-center">
-          <div onClick={handleConfirm} className="button-cms-mapping">
+        <Panel position="bottom-center">
+          <button
+            className="button-cms-mapping"
+            onClick={() => {
+              handleClick();
+            }}
+          >
             Confirm Mapping
-          </div>
-        </Panel> */}
+          </button>
+        </Panel>
         <Controls />
         <MiniMap />
         <Background variant="dots" gap={12} size={1} />
