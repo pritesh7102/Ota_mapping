@@ -20,6 +20,7 @@ export default function Flow() {
   const [yPositionOta, setYPositionOta] = React.useState(yConfirmed + 100);
   const [confirmedEdges, setConfirmedEdges] = React.useState([]);
   const [checkEffect, setCheckEffect] = React.useState(false);
+  const [text, setText] = React.useState("");
 
   // const [check, setCheck] = React.useState(false);
   useEffect(() => {
@@ -192,6 +193,34 @@ export default function Flow() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
+        <Panel>
+          <div style={{ display: "flex", flexDirection: "row" }}>
+            <button
+              className="button-cms-mapping"
+              onClick={() => {
+                handleClick();
+              }}
+            >
+              Home{" "}
+            </button>
+            <input
+              type="text"
+              placeholder="Search"
+              className="input-cms-mapping"
+              onChange={(e) => {
+                setText(e.target.value);
+              }}
+            />
+            <button
+              className="button-cms-mapping"
+              onClick={() => {
+                handleClick();
+              }}
+            >
+              Search
+            </button>
+          </div>
+        </Panel>
         <Panel position="left">
           <HotelPlans handleAdd={handleAdd} />
         </Panel>
